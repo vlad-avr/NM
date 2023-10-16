@@ -1,35 +1,18 @@
 import numpy as np
 import sys
 import math as math
-import random as rnd
-import time
 
-rnd.seed(time.time())
+A = np.array([[2, 3, -1, 4, 5], [3, 2, 4, -1, 6], [1, 5, 6, 7, -8], [6, 4, 5, 2, -3], [4, -7, 3, 5, 2]])
+print("Matrix A : ", A)
 
-class Matrix:
-    matr = [[]]
-    def __init__(self, N, max, min):
-        self.matr = np.zeros(shape=(N,N), dtype=float)
-        for i in range(N):
-            for j in range(N):
-                self.matr[i][j] = rnd.randint(min, max)
+b = np.array([10, 15, 20, 25, 30])
+print("Vector b : ", b)
+
+def check_matr(matr):
+    print("\nChecking if this system of linear computations can be solved:\n")
+    det = np.linalg.det(matr)
+    print("\nDeterminant : ", det)
+    if(det == 0):
+        print("\nDeterminant is 0 -> cannot be solved\n")
     
-    def printf(self):
-        print('\n'.join([''.join(['{:8}'.format(item) for item in row]) for row in self.matr]))    
-class Vector:
-    vec = []
-    def __init__(self, N, max, min):
-        self.vec = np.zeros(shape=(N), dtype=float)
-        for i in range(N):
-            self.vec[i] = rnd.randint(min, max)
-    
-    def printf(self):
-        print('\n','\t'.join(['{:5}'.format(item) for item in self.vec]) )
-        
-        
-matrix = Matrix(5, 10, 1)     
-matrix.printf()
-vec = Vector(5, 10, 1)
-vec.printf()
-    
-            
+check_matr(A)
