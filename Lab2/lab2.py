@@ -60,8 +60,8 @@ def gauss(A, b):
     
     return x
 
-def check_jacobi(matr):
-    print("\nChecking if this system of linear computations can be solved with Jacobi method:\n")
+def check_jacobi(matr, eps):
+    print("\nChecking if this system of linear computations can be solved with Jacobi method:\n")    
     for i in range(len(matr)):
         if(matr[i,i] == 0):
             print("\nUnable to solve : one of diagonal elements is 0")
@@ -74,15 +74,28 @@ def check_jacobi(matr):
             print("\nUnable to solve : sum of absolutes of elements in row is greater than diagonal element in row ", i)
             return False         
     print("\n All good\n")  
+    print("\nChecking the Theorem about convergence condition for any starting approximation for Jacobi method:\n")
+    matr_copy = np.copy(matr)
+    u, sig, v = np.linalg.svd(matr_copy)
+    for i in range(len(matr_copy)):
+        matr_copy[i,i] *= sig[i]
+        
+    det = np.linalg.det(matr_copy)
+    print("\nSignature numbers of A matrix: ", sig)
+    print("\nMatrix (A1 + A2 + lD) : \n", matr_copy, "\nAnd its determinant : ", det)
+    if abs(det) <= eps:
+        print("\nConditions are met : Jacobi method converges for all approximations\n")
+    else:
+        print("\nConditions are not met : Jacobi method may not converge for all approximations")
     return True
             
     
 def jacobi(A, b, eps):
-    if(check_jacobi(A) == False):
+    if(check_jacobi(A, eps) == False):
         return np.zeros(len(b))
     n = len(b)
     x = np.zeros(len(b))
-    
+    print("\nStarting approximation : ", x)
     while True:
         x_new = np.zeros(n)
         for i in range(n):
@@ -90,16 +103,22 @@ def jacobi(A, b, eps):
         print("\n Current approximation with Jacobi : ", x_new)
             
         #Using Frobenius norm
-        if np.linalg.norm(x_new - x) < eps:
-            print("\n Frobenius norm is less than ", eps, " -> result obtained\n")
+        frob = np.linalg.norm(x_new - x)
+        if frob < eps:
+            print("\n Frobenius norm : ", frob," is less than ", eps, " -> result obtained\n")
             return x_new
-        print("\n Frobenius norm is not less than ", eps, " -> continuing iterations\n")
+        print("\n Frobenius norm : ", frob, " is not less than ", eps, " -> continuing iterations\n")
         x = x_new
     
+def get_error(x_actual, x_approx):
+    print("\nCalculating error between actual result (from gauss method) and approximated result (from jacobi method) : \n")
+    er = np.linalg.norm(x_approx - x_actual)/np.linalg.norm(x_approx)
+    print("\nError : ", er)
     
     
         
-my_solution = gauss(a, b)
-print("Solution (Gauss): ", my_solution)
-my_solution = jacobi(a, b, 0.00001)
-print("Solution (Jacobi): ", my_solution)
+gauss_solution = gauss(a, b)
+print("Solution (Gauss): ", gauss_solution)
+jacobi_solution = jacobi(a, b, 0.0001)
+print("Solution (Jacobi): ", jacobi_solution)
+get_error(gauss_solution, jacobi_solution)
