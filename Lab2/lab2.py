@@ -115,10 +115,14 @@ def get_error(x_actual, x_approx):
     er = np.linalg.norm(x_approx - x_actual)/np.linalg.norm(x_approx)
     print("\nError : ", er)
     
-    
+
+def get_cond(matr):
+    c = np.linalg.cond(matr)
+    print("\nCondition number of a matrixx : ", c)
         
+get_cond(a);        
 gauss_solution = gauss(a, b)
 print("Solution (Gauss): ", gauss_solution)
-jacobi_solution = jacobi(a, b, 0.0001)
+jacobi_solution = jacobi(a, b, 0.001)
 print("Solution (Jacobi): ", jacobi_solution)
 get_error(gauss_solution, jacobi_solution)
