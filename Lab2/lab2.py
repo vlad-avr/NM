@@ -75,14 +75,30 @@ def check_jacobi(matr, eps):
             return False         
     print("\n All good\n")  
     print("\nChecking the Theorem about convergence condition for any starting approximation for Jacobi method:\n")
-    matr_copy = np.copy(matr)
-    u, sig, v = np.linalg.svd(matr_copy)
-    for i in range(len(matr_copy)):
-        matr_copy[i,i] *= sig[i]
-        
-    det = np.linalg.det(matr_copy)
-    print("\nSignature numbers of A matrix: ", sig)
-    print("\nMatrix (A1 + A2 + lD) : \n", matr_copy, "\nAnd its determinant : ", det)
+    matr_upper = np.zeros((len(matr), len(matr)))
+    matr_lower = np.zeros((len(matr), len(matr)))
+    diag = np.zeros((len(matr), len(matr)))
+    for i in range(len(matr)):
+        diag[i,i] = matr[i,i]
+        for j in range(i+1, len(matr)):
+            matr_upper[i,j] = matr[i,j]
+            matr_lower[j,i] = matr[j,i]
+            
+    print("\n", matr_upper, "\n", matr_lower, "\n", diag)
+    upper_lower = np.add(matr_upper, matr_lower)
+    print("\n", upper_lower)
+    d_m = -1*np.linalg.inv(diag)
+    print("\n", d_m)
+    B = np.matmul(d_m, upper_lower)
+    print("\nB : \n", B)
+    u, sig, v = np.linalg.svd(B)
+    for i in range(len(B)):
+        diag[i][i] = -sig[i]
+    
+    B = np.add(B, diag)
+    det = np.linalg.det(B)
+    print("\nSignature numbers of B matrix: ", sig)
+    print("\nMatrix (A1 + A2 + lD) : \n", B, "\nAnd its determinant : ", det)
     if abs(det) <= eps:
         print("\nConditions are met : Jacobi method converges for all approximations\n")
     else:
