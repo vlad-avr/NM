@@ -117,8 +117,12 @@ def get_error(x_actual, x_approx):
     
 
 def get_cond(matr):
+    u, sig, v = np.linalg.svd(matr)
     c = np.linalg.cond(matr)
     print("\nCondition number of a matrixx : ", c)
+    print("\n", max(abs(sig)), " ", min(abs(sig)))
+    if(c <= (max(abs(sig))/min(abs(sig)))+0.001 and c >= (max(abs(sig))/min(abs(sig)))-0.001):
+        print("\n Condition number ", c, " is more or equal to ", max(abs(sig))/min(abs(sig)))
         
 get_cond(a);        
 gauss_solution = gauss(a, b)
