@@ -4,20 +4,16 @@ from PIL import Image
 def get_pixel_map(path):
     img = Image.open(path)
     img = img.convert("L")
-    pixel_matrix = list(img.getdata())
+    pixel_map = list(img.getdata())
     cols, rows = img.size
     print("\n Size : ", rows, "x", cols)
-    pixel_matrix = [pixel_matrix[i * cols:(i + 1) * cols] for i in range(rows)]
-    return pixel_matrix
+    pixel_map = [pixel_map[i * cols:(i + 1) * cols] for i in range(rows)]
+    return pixel_map
 
 def convert_to_image(path, pixel_map):
     img = Image.new('L', (len(pixel_map[0]), len(pixel_map)))
     img.putdata([pixel for row in pixel_map for pixel in row])
     img.save(path)
-
-def calculate_z_greville(a_cur, a_inv):
-    return np.identity(a_cur.shape[1]) - mult(a_inv, a_cur)
-
 
 def mult(*args):
     if len(args) == 0:
@@ -89,9 +85,9 @@ def transform(operator, x, y):
     return result
 
 def get_operator(input, input_inv, output):
-    z = np.identity(input.shape[0]) - np.dot(input, input_inv)
+    z = np.identity(input.shape[0]) - mult(input, input_inv)
     v = np.zeros((output.shape[0], input.shape[0]))
-    return np.dot(output, input_inv) + np.dot(v, z.T)
+    return mult(output, input_inv) + mult(v, z.T)
 
 input =  np.array(get_pixel_map("D:/python/NM/MS_Lab2/x1.bmp"))
 output = np.array(get_pixel_map("D:/python/NM/MS_Lab2/y1.bmp"))
