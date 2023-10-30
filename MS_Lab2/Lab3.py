@@ -92,7 +92,7 @@ def moore(matrix, eps):
 
 def transform(operator, x, y):
     result = mult(operator, x)
-    print("\nDiviation:", np.sqrt(np.sum(((y - result)**2))))
+    print("\nDistance:", np.sqrt(np.sum(((y - result)**2))))
     return result
 
 def get_operator(input, input_inv, output):
