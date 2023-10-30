@@ -15,13 +15,6 @@ def convert_to_image(path, pixel_map):
     img.putdata([pixel for row in pixel_map for pixel in row])
     img.save(path)
 
-def calculate_first(a0):
-    dt = mult(a0.T, a0)
-    if dt == 0:
-        return np.vstack(a0)
-    return np.vstack(a0 / dt)
-
-
 def calculate_z_greville(a_cur, a_inv):
     return np.identity(a_cur.shape[1]) - mult(a_inv, a_cur)
 
