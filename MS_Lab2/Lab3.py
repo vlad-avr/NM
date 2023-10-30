@@ -92,7 +92,6 @@ def moore(matrix, eps):
 
 def transform(operator, x, y):
     result = mult(operator, x)
-    print("\n", y , "\n", result)
     print("\nDiviation:", np.sqrt(np.sum(((y - result)**2))))
     return result
 
@@ -101,8 +100,8 @@ def get_operator(input, input_inv, output):
     v = np.zeros((output.shape[0], input.shape[0]))
     return np.dot(output, input_inv) + np.dot(v, z.T)
 
-input =  np.array(get_pixel_map("D:/python/NM/MS/x1.bmp"))
-output = np.array(get_pixel_map("D:/python/NM/MS/y1.bmp"))
+input =  np.array(get_pixel_map("D:/python/NM/MS_Lab2/x1.bmp"))
+output = np.array(get_pixel_map("D:/python/NM/MS_Lab2/y1.bmp"))
 append_vec = np.ones((1, input.shape[1]))
 input = np.vstack((input, append_vec))
 
@@ -112,8 +111,8 @@ inverse_moore = moore(input, 0.000001)
 print("\nResult using Greville method of finding pseudo-inverse:\n")
 operator = get_operator(input, inverse_greville, output)
 g_res = transform(operator, input, output)
-convert_to_image("D:/python/NM/MS/res_greville.bmp", g_res)
+convert_to_image("D:/python/NM/MS_Lab2/res_greville.bmp", g_res)
 print("\nResult using Moore-Penrose method of finding pseudo-inverse:\n")
 operator = get_operator(input, inverse_moore, output)
 m_res = transform(operator, input, output)
-convert_to_image("D:/python/NM/MS/res_moore.bmp", m_res)
+convert_to_image("D:/python/NM/MS_Lab2/res_moore.bmp", m_res)
