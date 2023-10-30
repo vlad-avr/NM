@@ -55,25 +55,22 @@ def greville(A, eps):
 
     return inverse_A
 
-def moore(matrix, eps):
+def moore(A, eps):
     d = 1
-    width = matrix.shape[0]
-    height = matrix.shape[1]
+    width = A.shape[0]
+    height = A.shape[1]
     cur = np.zeros([height, width])
-    i = 0
     if width < height:
         while True:
             prev = cur.copy()
-            i += 1
-            cur = mult(matrix.T, np.linalg.inv(mult(matrix, matrix.T) + (d**2) * np.identity(width)))
+            cur = mult(A.T, np.linalg.inv(mult(A, A.T) + (d**2) * np.identity(width)))
             if np.sqrt(np.sum((prev - cur) ** 2)) < eps:
                 break
             d /= 2
     else:
         while True:
             prev = cur.copy()
-            i += 1
-            cur = mult(np.linalg.inv(mult(matrix.T, matrix) + (d**2) * np.identity(height)), matrix.T)
+            cur = mult(np.linalg.inv(mult(A.T, A) + (d**2) * np.identity(height)), A.T)
             if np.sqrt(np.sum((prev - cur) ** 2)) < eps:
                 break
             d /= 2
