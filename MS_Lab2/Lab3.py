@@ -78,7 +78,7 @@ def moore(A, eps):
 
 def transform(operator, x, y):
     result = mult(operator, x)
-    print("\nDistance:", np.sqrt(np.sum(((y - result)**2))))
+    print("Distance:", np.sqrt(np.sum(((y - result)**2))))
     return result
 
 def get_operator(input, input_inv, output):
@@ -92,7 +92,7 @@ append_vec = np.ones((1, input.shape[1]))
 input = np.vstack((input, append_vec))
 
 inverse_greville = greville(input, 0.001)
-inverse_moore = moore(input, 0.000001)
+inverse_moore = moore(input, 0.001)
 
 print("\nResult using Greville method of finding pseudo-inverse:\n")
 operator = get_operator(input, inverse_greville, output)
