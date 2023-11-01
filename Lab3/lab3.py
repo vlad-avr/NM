@@ -1,20 +1,32 @@
 import numpy as np
 import math as m
 
-def f1(x,y):
-    return m.sin(2*x-y) - 1.2*x - 0.4
+def modified_newton_method(f, jacobian, x0, tol=1e-6, max_iter=100):
+    x = x0
 
-def f2(x,y):
-    return 0.8*x**2 + 1.5*y**2 - 1
+    for i in range(max_iter):
+        f_x = f(x)
+        jacobian_x = jacobian(x)
+        delta_x = -np.dot(np.linalg.inv(jacobian_x), f_x)
+        x = x + delta_x
+        if np.linalg.norm(delta_x) < tol:
+            return x
+    print("NOT FOUND\n")
+    return x
 
-def df1dx(x,y):
-    return 2.*m.cos(2*x-y) - 1.2
+def f(x):
+    f1 = m.sin(2*x[0] - x[1]) - 1.2*x[0] - 0.4
+    f2 = 0.8*x[0]**2 + 1.5*x[1]**2 - 1
+    return np.array([f1, f2])
 
-def df1dy(x,y):
-    return -1.*m.cos(2*x-y)
+def jacobian_matrix(x):
+    J = np.array([[2.*m.cos(2*x[0] - x[1]) - 1.2, -1.*m.cos(2*x[0]-x[1])], [1.6*x[0], 3.*x[1]]])
+    return J
 
-def df2dx(x):
-    return 1.6*x
+# Initial guess
+x0 = np.array([0.5, 0.5])
 
-def df2dy(y):
-    return 3.*y
+result = modified_newton_method(f, jacobian_matrix, x0)
+
+print("Solution:", result)
+print("\nResut: f(x) = ", f(result))
