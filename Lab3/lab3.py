@@ -32,7 +32,7 @@ def jacobian_matrix(x):
     return J
 
 # Initial guess
-x0 = np.array([0.5, 0.5])
+x0 = np.array([-0.5, -0.5])
 
 result = modified_newton_method(f, jacobian_matrix, x0)
 
