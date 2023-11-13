@@ -3,16 +3,17 @@ import math as m
 
 def modified_newton_method(f, jacobian, x0, tol=1e-6, max_iter=100):
     x = x0
+    jacobian_x = jacobian(x)
+    print("\nJacobian : \n", jacobian_x)
+    if abs(np.linalg.det(jacobian_x)) < tol:
+            print("\n Convergence conditions are not met : det(A) == 0")
+            return x
+    
+    jacobian_inv = np.linalg.inv(jacobian_x)
+    print("\nJacobian inverse : \n", jacobian_inv)
     print("x(0) : ", x0)
     for i in range(max_iter):
         f_x = f(x)
-        jacobian_x = jacobian(x)
-        print("\nJacobian : \n", jacobian_x)
-        if abs(np.linalg.det(jacobian_x)) < tol:
-            print("\n Convergence conditions are not met : det(A) == 0")
-            return x
-        jacobian_inv = np.linalg.inv(jacobian_x)
-        print("\nJacobian inverse : \n", jacobian_inv)
         print("F(x(", i,")) : ", f_x)
         delta_x = -np.dot(jacobian_inv, f_x)
         print("\n z(", i, ") : ", delta_x)
