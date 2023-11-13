@@ -9,13 +9,13 @@ def modified_newton_method(f, jacobian, x0, tol=1e-6, max_iter=100):
         jacobian_x = jacobian(x)
         print("\nJacobian : \n", jacobian_x)
         if abs(np.linalg.det(jacobian_x)) < tol:
-            print("\n Convergence conditions are not met : det(A) == 1")
+            print("\n Convergence conditions are not met : det(A) == 0")
             return x
         jacobian_inv = np.linalg.inv(jacobian_x)
         print("\nJacobian inverse : \n", jacobian_inv)
         print("F(x(", i,")) : ", f_x)
         delta_x = -np.dot(jacobian_inv, f_x)
-        print("\n z(", i+1, ") : ", delta_x)
+        print("\n z(", i, ") : ", delta_x)
         x = x + delta_x
         print("x(", i+1,") : ", x)
         if np.linalg.norm(delta_x) < tol:
