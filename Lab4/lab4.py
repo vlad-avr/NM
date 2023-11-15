@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.optimize import minimize_scalar
 
 # Function to find the roots of the Chebyshev polynomial
 def chebyshev_roots(n):
@@ -7,7 +8,8 @@ def chebyshev_roots(n):
 
 # Function to evaluate the given non-linear equation
 def equation(x):
-    return x**3 - 4*x**2 - 4*x + 13 - np.sin(x)
+    #return x**3 - 4*x**2 - 4*x + 13 - np.sin(x)
+    return 3**x
 
 # Newton's interpolation polynomial coefficients
 def newton_coefficients(x_nodes, y_nodes):
@@ -31,13 +33,15 @@ def newton_interpolation(x, x_nodes, coefficients):
     return result
 
 # Number of interpolation points
-n_points = 10
+n_points = 3
 
 # Chebyshev roots as interpolation points
 interpolation_points = chebyshev_roots(n_points)
+print(interpolation_points)
 
 # Evaluate the function at interpolation points
 function_values = equation(interpolation_points)
+print(function_values)
 
 # Compute Newton's interpolation coefficients
 coefficients = newton_coefficients(interpolation_points, function_values)
