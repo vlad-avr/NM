@@ -1,68 +1,138 @@
 import numpy as np
+import sympy as sp
 import matplotlib.pyplot as plt
-from scipy.interpolate import lagrange
-from scipy.optimize import newton
+from sympy.plotting import plot
+from sympy.abc import x
 
-# Define the equation for which you are looking for the root
-def equation(x):
-    return x**3 - 4*x**2 - 4*x + 13 - np.sin(x)
+np.set_printoptions(precision=4, suppress=True)
 
-# Function to find Chebyshev nodes
-def chebyshev_nodes(n):
-    nodes = [np.cos((2*k - 1) * np.pi / (2*n)) for k in range(1, n+1)]
-    return nodes
+f = "x**3 - 4*x**2 - 4*x + 13 - sin(x)"
+func = sp.sympify(f)
+
+roots = sp.nsolve(func, x, 5, dict=True)
+
+points_on_graph = list()
+for root in roots:
+    point = {
+        'args': [root[x], 0],
+        'color': "black",
+        'ms': 5,
+        'marker': "o"
+    }
+    points_on_graph.append(point)
+
+print("f(x): ")
+sp.pprint(func)
+print("\n f(x) root : ", roots)
+
+#Interval
+a = 0
+b = 5
+
+# Number of nodes
+m = 10
+# Polynomial degree
+n = m - 1
 
 
-# Function to plot the function and the interpolated polynomial
-def plot_function_and_interpolation(equation, interp_poly, nodes, x_range, root_direct, root_inverse):
-    x_values = np.linspace(x_range[0], x_range[1], 1000)
-    y_function = equation(x_values)
-    y_interpolation = interp_poly(x_values)
+def get_chebs(a, b, n):
+    res = []
+    for i in range(n + 1):
+        res.append(((a + b) / 2) + ((b - a) / 2) * sp.cos((2 * i + 1) * sp.pi / (2 * (n + 1))).evalf()
+    )
+    return res
 
-    plt.plot(x_values, y_function, label="Original Function", linestyle="--")
-    plt.plot(nodes, equation(np.array(nodes)), 'o', label="Chebyshev Nodes")
-    plt.plot(x_values, y_interpolation, label="Interpolated Polynomial")
-    plt.axhline(0, x_range[0], x_range[1], linestyle="--", label="Y axis")
-    plt.plot(root_direct, equation(root_direct), 'o', label="Direct Root")
-    plt.plot(root_inverse, equation(root_inverse), 'o', label="Root Inverse")
-    plt.title("Function and Interpolated Polynomial")
-    plt.xlabel("x")
-    plt.ylabel("y")
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+def get_divided_differences(n, func, ch_nodes):
+    res = np.ndarray(shape=(n + 1, n + 1), dtype=float)
 
-# Find the greatest root using inverse interpolation
-def find_greatest_root_inverse_interpolation():
-    n = 10
-    cheb_nodes = chebyshev_nodes(n)
-    f_values = equation(np.array(cheb_nodes))
-    interp_poly = lagrange(cheb_nodes, f_values)
+    for j in range(n + 1):
+        for j in range(n + 1):
+            res[j][j] = 0
 
-    # Find the root using inverse interpolation
-    initial_guess = 4.0
-    root_inverse_interp = newton(interp_poly, initial_guess)
-    
-    return root_inverse_interp
+    for i in range(n + 1):
+        all_zero = True
+        for j in range(n + 1 - i):
+            if i == 0:
+                res[j][i] = func.subs(x, ch_nodes[j])
+            else:
+                res[j][i] = ((res[j + 1][i - 1] - res[j][i - 1]) / (ch_nodes[j + i] - ch_nodes[j]))
+            if abs(res[j][i]) > np.power(10., -16):
+                all_zero = False
+        if all_zero:
+            break
+    return res
 
-# Find the greatest root using direct interpolation
-def find_greatest_root_direct_interpolation():
-    initial_guess = 5.0
-    root_direct_interp = newton(equation, initial_guess)
-    
-    return root_direct_interp
+def forward_interpolation(divided_differences, n):
+    polynom_forward = 0.
+    for k in range(n + 1):
+        term_k = divided_differences[0][k]
+        for i in range(k):
+            term_k *= (x - ch_nodes[i])
+        polynom_forward += term_k
+    return sp.poly(polynom_forward).as_expr()
 
-# Main program
-greatest_root_inverse_interp = find_greatest_root_inverse_interpolation()
-greatest_root_direct_interp = find_greatest_root_direct_interpolation()
+def backward_interpolation(divided_differences, n):
+    polynom_rev = 0.
+    for k in range(n + 1):
+        term_k = divided_differences[n - k][k]
+        for i in range(k):
+            term_k *= (x - ch_nodes[n - i])
+        polynom_rev += term_k
+    return sp.poly(polynom_rev).as_expr()
 
-print("Greatest root using inverse interpolation:", greatest_root_inverse_interp)
-print("Greatest root using direct interpolation:", greatest_root_direct_interp)
+ch_nodes = get_chebs(a, b, m)
 
-# Plot the function and the interpolated polynomial
-x_range = (-2, 5)
-n = 10
-cheb_nodes = chebyshev_nodes(n)
-f_values = equation(np.array(cheb_nodes))
-interp_poly = lagrange(cheb_nodes, f_values)
-plot_function_and_interpolation(equation, interp_poly, cheb_nodes, x_range, greatest_root_direct_interp, greatest_root_inverse_interp)
+for zero in ch_nodes:
+    point = {
+        'args': [zero, func.subs(x, zero)],
+        'color': "purple",
+        'ms': 5,
+        'marker': "o",
+        'label': 'bib'
+    }
+    points_on_graph.append(point)
+
+print("\n Chbyshov zeros on [", a, ",", b, "] interval : ")
+print(ch_nodes)
+
+divided_differences = get_divided_differences(n, func, ch_nodes)
+print("\n\nDivided Differences : \n")
+print(divided_differences)
+
+
+forward_pol = forward_interpolation(divided_differences, n)
+print("\nResult using forward interpolation :")
+sp.pprint(forward_pol)
+
+backward_pol = backward_interpolation(divided_differences, n)
+print("\nResult using backward interpolation :")
+sp.pprint(backward_pol)
+
+forward_solution = sp.nsolve(forward_pol, x, 5, dict=True)
+for root in forward_solution:
+    point = {
+        'args': [root[x], 0],
+        'color': "orange",
+        'ms': 5,
+        'marker': "o"
+    }
+    points_on_graph.append(point)
+
+backward_solution = sp.nsolve(backward_pol, x, 4, dict=True)
+for root in backward_solution:
+    point = {
+        'args': [root[x], 0],
+        'color': "yellow",
+        'ms': 5,
+        'marker': "o"
+    }
+    points_on_graph.append(point)
+
+print("\nGreatest root of P(x) (forward) : ", forward_solution)
+print("\nGreatest root of P(x) (backward) : ", backward_solution)
+
+plt.style.use('_mpl-gallery')
+plot_poly = plot(func, line_color="red", label="Function", legend=True, xlim=(-15, 15), ylim=(-15, 15), markers=points_on_graph, show=False)
+plot_poly.append(plot(forward_pol, line_color="green", label="Forward Interpolation", show=False)[0])
+plot_poly.append(plot(backward_pol, line_color="blue", label="Backward Interpolation", show=False)[0])
+plot_poly.show()
