@@ -60,7 +60,6 @@ def init_matr():
 
 def approximate(y_matr, params, beta_symbols, beta_values, eps, h=0.2):
     a_matrix = init_matr().subs(params)
-    # a_matrix = a_matrix.subs(params)
     print(a_matrix)
     beta_vector = np.array([beta_values[beta_symbols[0]], beta_values[beta_symbols[1]], beta_values[beta_symbols[2]]])
     while True:
