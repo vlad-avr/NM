@@ -160,7 +160,7 @@ def calculate(y_matrix, params, beta, beta_init, eps):
             return beta_init
         
         
-mtx_input = read('input\\y10.txt')
+mtx_input = read('D:\\python\\NM\\MS_Lab3\\y1.txt')
 c1, c2, c3, c4, m1, m2, m3 = sp.symbols('c1 c2 c3 c4 m1 m2 m3')
 beta_init = {c1: 0.1, c2: 0.1, c3: 0.4}
 beta_init_real = {c1: 0.14, c2: 0.3, c3: 0.2}
