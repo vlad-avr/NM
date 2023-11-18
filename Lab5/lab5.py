@@ -2,7 +2,7 @@ def f(x):
     return 1 / (2 + x)
 
 def f_second_der(x):
-    return 2/(2+x)**3
+    return 2/(2 + x)**3
 
 def midpoint_rule(a, b, n):
     h = (b - a) / n
@@ -33,6 +33,8 @@ def integrate_midpoint_rule(a, b, tolerance):
 a = 1
 b = 5
 eps = 0.05
+
+# Result using regular integral computation : 0.8473
 
 result = integrate_midpoint_rule(a, b, eps)
 print("The result of the integral is: ", result)
