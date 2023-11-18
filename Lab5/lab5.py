@@ -21,10 +21,13 @@ def estimate_error(a, b, n):
 def integrate_midpoint_rule(a, b, tolerance):
     n = 1
     integral = midpoint_rule(a, b, n)
+    print("\nStarting integral approximation : ", integral, " with n = ", n)
     while True:
         n *= 2
         new_integral = midpoint_rule(a, b, n)
         error = abs(new_integral - integral)
+        print("\nCurrent integral approximation : ", new_integral, " with n = ", n)
+        print("\nError : ", error)
         if error < tolerance:
             break
         integral = new_integral
