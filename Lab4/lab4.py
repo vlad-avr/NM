@@ -1,138 +1,124 @@
 import numpy as np
-import sympy as sp
 import matplotlib.pyplot as plt
-from sympy.plotting import plot
-from sympy.abc import x
 
-np.set_printoptions(precision=4, suppress=True)
-
-f = "x**3 - 4*x**2 - 4*x + 13 - sin(x)"
-func = sp.sympify(f)
-
-roots = sp.nsolve(func, x, 5, dict=True)
-
-points_on_graph = list()
-for root in roots:
-    point = {
-        'args': [root[x], 0],
-        'color': "black",
-        'ms': 5,
-        'marker': "o"
-    }
-    points_on_graph.append(point)
-
-print("f(x): ")
-sp.pprint(func)
-print("\n f(x) root : ", roots)
-
-#Interval
-a = 0
-b = 5
-
-# Number of nodes
-m = 10
-# Polynomial degree
-n = m - 1
-
+def get_root(p, x, a, b):
+  eps = 0.0001
+  approx = a + (b - a) / 2
+  value = polynom(approx, p, x)
+  value_a = polynom(a, p, x)
+  while(abs(0 - value) > eps):
+    if value_a * value >= 0:
+      a = approx
+    else:
+      b = approx
+    approx = a + (b - a) / 2
+    value = polynom(approx, p, x)
+    value_a = polynom(a, p, x)
+  return approx
 
 def get_chebs(a, b, n):
     res = []
     for i in range(n + 1):
-        res.append(((a + b) / 2) + ((b - a) / 2) * sp.cos((2 * i + 1) * sp.pi / (2 * (n + 1))).evalf()
+        res.append(((a + b) / 2) + ((b - a) / 2) * np.cos((2 * i + 1) * np.pi / (2 * (n + 1)))
     )
     return res
 
-def get_divided_differences(n, func, ch_nodes):
-    res = np.ndarray(shape=(n + 1, n + 1), dtype=float)
+def f(x):
+  return x**3 - 4*x**2 - 4*x + 13 - np.sin(x)
 
-    for j in range(n + 1):
-        for j in range(n + 1):
-            res[j][j] = 0
+def f2(x, y):
+  l = len(x)
+  if l == 1:
+    return y[0]
+  if l > 2:
+    return (f2(x[1:l], y[1:l]) - f2(x[0:l-1], y[0:l-1])) / (x[l-1] - x[0])
 
-    for i in range(n + 1):
-        all_zero = True
-        for j in range(n + 1 - i):
-            if i == 0:
-                res[j][i] = func.subs(x, ch_nodes[j])
-            else:
-                res[j][i] = ((res[j + 1][i - 1] - res[j][i - 1]) / (ch_nodes[j + i] - ch_nodes[j]))
-            if abs(res[j][i]) > np.power(10., -16):
-                all_zero = False
-        if all_zero:
-            break
-    return res
+  return (y[1] - y[0]) / (x[1] - x[0])
 
-def forward_interpolation(divided_differences, n):
-    polynom_forward = 0.
-    for k in range(n + 1):
-        term_k = divided_differences[0][k]
-        for i in range(k):
-            term_k *= (x - ch_nodes[i])
-        polynom_forward += term_k
-    return sp.poly(polynom_forward).as_expr()
+def polynom(val, p, x):
+  value = 0
+  for i in range(n):
+    add = p[i]
+    for j in range(0, i):
+      add *= val - x[j]
+    value += add
+  return value
 
-def backward_interpolation(divided_differences, n):
-    polynom_rev = 0.
-    for k in range(n + 1):
-        term_k = divided_differences[n - k][k]
-        for i in range(k):
-            term_k *= (x - ch_nodes[n - i])
-        polynom_rev += term_k
-    return sp.poly(polynom_rev).as_expr()
+n = 9
+a, b = 4, 5
+step = 4.0
+x = []
+y = []
 
-ch_nodes = get_chebs(a, b, m)
+f_x = []
+f_y = []
+for i in range(1000):
+    f_x.append(step)
+    f_y.append(f(step))
+    step += 0.001
+    
+    
+plt.plot(f_x, f_y)
+plt.show()
+x = get_chebs(a, b, n)
+print("Chebs : ", x)
+for i in x:
+  y.append(f(i))
 
-for zero in ch_nodes:
-    point = {
-        'args': [zero, func.subs(x, zero)],
-        'color': "purple",
-        'ms': 5,
-        'marker': "o",
-        'label': 'bib'
-    }
-    points_on_graph.append(point)
+print(f"Interval: [{a};{b}]")
+print(f"N Nodes: {n+1}")
+print()
+print(f"X: {x}")
+print(f"Y: {y}")
 
-print("\n Chbyshov zeros on [", a, ",", b, "] interval : ")
-print(ch_nodes)
+koefs_straight = []
+koefs_inverse = []
 
-divided_differences = get_divided_differences(n, func, ch_nodes)
-print("\n\nDivided Differences : \n")
-print(divided_differences)
+x_temp = []
+y_temp = []
+for i in range(len(x)):
+  x_temp.append(x[i])
+  y_temp.append(y[i])
+  koefs_straight.append(f2(x_temp, y_temp))
 
+x_temp = []
+y_temp = []
+for i in range(len(x)):
+  x_temp.append(y[i])
+  y_temp.append(x[i])
+  koefs_inverse.append(f2(x_temp, y_temp))
 
-forward_pol = forward_interpolation(divided_differences, n)
-print("\nResult using forward interpolation :")
-sp.pprint(forward_pol)
+print()
+print("Straight interpolation koefs: ")
+print(koefs_straight)
+print("Inverse interpolation koefs: ")
+print(koefs_inverse)
+print()
 
-backward_pol = backward_interpolation(divided_differences, n)
-print("\nResult using backward interpolation :")
-sp.pprint(backward_pol)
+f_x = []
+f_y = []
+step = 4.0
+for i in range(1000):
+    f_x.append(step)
+    f_y.append(polynom(step, koefs_straight, x))
+    step += 0.001 
+plt.plot(f_x, f_y)
 
-forward_solution = sp.nsolve(forward_pol, x, 5, dict=True)
-for root in forward_solution:
-    point = {
-        'args': [root[x], 0],
-        'color': "orange",
-        'ms': 5,
-        'marker': "o"
-    }
-    points_on_graph.append(point)
+plt.show()
 
-backward_solution = sp.nsolve(backward_pol, x, 4, dict=True)
-for root in backward_solution:
-    point = {
-        'args': [root[x], 0],
-        'color': "yellow",
-        'ms': 5,
-        'marker': "o"
-    }
-    points_on_graph.append(point)
+f_x = []
+f_y = []
+step = -1.0
+for i in range(1000):
+    f_y.append(step)
+    f_x.append(polynom(step, koefs_inverse, y))
+    step += 0.001 
+plt.plot(f_x, f_y)
 
-print("\nGreatest root of P(x) (forward) : ", forward_solution)
-print("\nGreatest root of P(x) (backward) : ", backward_solution)
+plt.show()
+res_inverse = polynom(0, koefs_inverse, y)
+res_striaght = get_root(koefs_straight,x,a,b)
 
-plt.style.use('_mpl-gallery')
-plot_poly = plot(func, line_color="red", label="Function", legend=True, xlim=(-15, 15), ylim=(-15, 15), markers=points_on_graph, show=False)
-plot_poly.append(plot(forward_pol, line_color="green", label="Forward Interpolation", show=False)[0])
-plot_poly.append(plot(backward_pol, line_color="blue", label="Backward Interpolation", show=False)[0])
-plot_poly.show()
+print(f"Straight interpolation root = {res_striaght}")
+print(f"Inverse interpolation root = {res_inverse}")
+
