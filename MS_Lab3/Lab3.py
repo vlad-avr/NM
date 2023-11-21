@@ -64,7 +64,7 @@ def approximate(y_matr, params, beta_symbols, beta_values, eps, h=0.2):
     while True:
         a_complete = np.array((a_matrix.subs(beta_values)).tolist())
         u_matr = np.zeros((6, 3))
-        delta_integral = 0
+        quality_degree = 0
         integral_part_inverse = np.zeros((3, 3))
         integral_part_mult = np.zeros((1, 3))
         y_approximation = y_matr[0]
@@ -75,14 +75,14 @@ def approximate(y_matr, params, beta_symbols, beta_values, eps, h=0.2):
 
             integral_part_mult = (integral_part_mult + np.dot(u_matr.T, y_matr[i] - y_approximation)).astype('float64')
 
-            delta_integral = delta_integral + np.dot(y_matr[i] - y_approximation, y_matr[i] - y_approximation)
+            quality_degree = quality_degree + np.dot((y_matr[i] - y_approximation).T, y_matr[i] - y_approximation)
             
             u_matr = get_u_matr(a_complete, b_derivative_matr, u_matr, h)
             y_approximation = get_y(a_complete, y_approximation, h)
             
         integral_part_inverse = integral_part_inverse * h
         integral_part_mult = integral_part_mult * h
-        delta_integral = delta_integral * h
+        quality_degree = quality_degree * h
         
         delta_beta = np.dot(np.linalg.inv(integral_part_inverse), integral_part_mult.flatten())
         beta_vector = beta_vector + delta_beta
@@ -93,8 +93,8 @@ def approximate(y_matr, params, beta_symbols, beta_values, eps, h=0.2):
             beta_symbols[2]: beta_vector[2]
         }
         print("Current approximated values : ", beta_vector)
-        print("Delta : ", delta_integral)
-        if delta_integral < eps:
+        print("Delta : ", quality_degree)
+        if quality_degree < eps:
             return beta_values
         print("Delta is greater than ", eps, " -> next iteration")
         
