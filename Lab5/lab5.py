@@ -1,43 +1,46 @@
+import numpy as np
+import math as math
+
 def f(x):
     return 1 / (2 + x)
 
 def f_second_der(x):
     return 2/(2 + x)**3
 
-def midpoint_rule(a, b, n):
-    h = (b - a) / n
-    result = 0
-    for i in range(n):
-        xi = a + (i + 0.5) * h
-        result += f(xi)
-    result *= h
-    return result
 
-def estimate_error(a, b, n):
+def get_h(a, b, eps):
     M2 = max(abs(f_second_der(x)) for x in range(a, b + 1))
-    h = (b - a) / n
-    return (M2 * (b - a) * h**2) / 24
+    print(M2)
+    h = np.sqrt((24*eps)/(M2 * (b-a)))
+    return h
 
-def integrate_midpoint_rule(a, b, tolerance):
-    n = 1
-    integral = midpoint_rule(a, b, n)
-    print("\nStarting integral approximation : ", integral, " with n = ", n)
-    while True:
-        n *= 2
-        new_integral = midpoint_rule(a, b, n)
-        error = abs(new_integral - integral)
-        print("\nCurrent integral approximation : ", new_integral, " with n = ", n)
-        print("\nError : ", error)
-        if error < tolerance:
-            break
-        integral = new_integral
-    return new_integral
+def get_f_interval(a, n, h):
+    f_x = []
+    cur = a
+    next = a+h
+    for i in range(1, n):
+        f_x.append(f((cur + next)/2))
+        cur = next
+        next += h
+    return f_x
+        
+
+def calculate_midpoint(f_x, h):
+    res = 0
+    for i in f_x:
+        res += i
+    res *= h
+    return res       
+        
 
 a = 1
 b = 5
 eps = 0.05
 
 # Result using regular integral computation : 0.8473
-
-result = integrate_midpoint_rule(a, b, eps)
+#h = math.floor(get_h(a, b, eps))
+h = 0.05
+n = (int)((b-a)/h)
+f_x = get_f_interval(a, n, h)
+result = calculate_midpoint(f_x, h)
 print("The result of the integral is: ", result)
