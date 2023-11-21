@@ -39,7 +39,7 @@ eps = 0.05
 
 # Result using regular integral computation : 0.8473
 #h = math.floor(get_h(a, b, eps))
-h = 0.05
+h = 0.1
 n = (int)((b-a)/h)
 f_x = get_f_interval(a, n, h)
 result = calculate_midpoint(f_x, h)
