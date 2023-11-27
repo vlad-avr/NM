@@ -11,11 +11,7 @@ def get_h(a, b, eps):
     M2 = max(abs(f_second_der(x)) for x in range(a, b + 1))
     print("Maximum value of 2nd derivative : ", M2)
     h = np.sqrt((24*eps)/(M2 * (b-a)))
-    approx = 0.0
-    while True:
-        if approx + 0.5 > h:
-            return approx
-        approx += 0.5
+    return h
 
 def midpoint_rule(a, b, n):
     h = (b - a) / n
