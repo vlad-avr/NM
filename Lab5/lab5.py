@@ -25,9 +25,9 @@ def midpoint_rule(a, b, n):
 
 a = 1
 b = 5
-h = get_h(a, b, 0.05)
+h = math.floor(get_h(a, b, 0.05))
 print("h = ", h)
-n = math.floor((b-a)/h)
+n = (int)((b-a)/h)
 print("n = ", n)
 result = midpoint_rule(a, b, n)
 print(f"The result of the definite integral is: {result}")
